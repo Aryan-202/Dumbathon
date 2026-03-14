@@ -461,13 +461,10 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.85);
             z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
         }
 
         #ad-overlay.active {
-            display: flex;
+            display: block;
         }
 
         .ad-counter {
@@ -632,9 +629,6 @@
             <!-- The Trap Trigger -->
             <button class="beveled sidebar-folder" onclick="openFolderLevel(1)">📁 FOLDER</button>
             
-            <br>
-            <!-- Dev Button (Temporary) -->
-            <button class="beveled sidebar-folder blink" style="color: red; border-color: red; margin-bottom: 20px;" onclick="startAdSequence(3)">[DEV] TRIGGER ADS</button>
             <br>
             <div class="construction-gif" title="UNDER CONSTRUCTION"></div>
             
@@ -876,11 +870,7 @@
         }
     ];
 
-    let currentAdQueue = [];
-    let currentAdIndex = 0;
-    let totalAdsToPlay = 0;
-    let adInterval = null;
-    let adTimeRemaining = 15;
+    let activeAds = 0;
 
     function shuffleArray(array) {
         let currentIndex = array.length, randomIndex;
@@ -894,76 +884,115 @@
 
     function startAdSequence(count) {
         let shuffledPool = shuffleArray([...adPool]);
-        currentAdQueue = shuffledPool.slice(0, count);
-        totalAdsToPlay = currentAdQueue.length;
-        currentAdIndex = 0;
+        let selectedAds = shuffledPool.slice(0, count);
         
-        if(totalAdsToPlay > 0) {
-            document.getElementById('ad-overlay').classList.add('active');
-            playNextAd();
-        }
-    }
-
-    function playNextAd() {
-        if(currentAdIndex >= totalAdsToPlay) {
+        let overlay = document.getElementById('ad-overlay');
+        overlay.innerHTML = ''; // clear previous
+        overlay.classList.add('active');
+        activeAds = selectedAds.length;
+        
+        if (activeAds === 0) {
             endAdSequence();
             return;
         }
 
-        let ad = currentAdQueue[currentAdIndex];
-        
-        document.getElementById('ad-counter').innerText = `AD ${currentAdIndex + 1} OF ${totalAdsToPlay}`;
-        document.getElementById('ad-company').innerText = ad.company;
-        document.getElementById('ad-img').innerText = ad.product;
-        document.getElementById('ad-headline').innerText = ad.headline;
-        document.getElementById('ad-tagline').innerText = ad.tagline;
-        document.getElementById('ad-fineprint').innerText = ad.fineprint;
-        
-        adTimeRemaining = 15;
-        document.getElementById('ad-timer-text').innerText = `CLOSING IN: ${adTimeRemaining}s`;
+        selectedAds.forEach((ad, i) => {
+            createAdBox(ad, i);
+        });
+    }
 
-        clearInterval(adInterval);
-        adInterval = setInterval(() => {
-            adTimeRemaining--;
-            if(adTimeRemaining <= 0) {
-                clearInterval(adInterval);
-                currentAdIndex++;
-                playNextAd();
+    function createAdBox(ad, index) {
+        let box = document.createElement('div');
+        box.className = 'ad-box';
+        
+        let top = Math.floor(Math.random() * Math.max(10, window.innerHeight - 450));
+        let left = Math.floor(Math.random() * Math.max(10, window.innerWidth - 450));
+        top = Math.max(10, top);
+        left = Math.max(10, left);
+        
+        box.style.position = 'absolute';
+        box.style.top = top + 'px';
+        box.style.left = left + 'px';
+        box.style.zIndex = 10000 + index;
+        
+        let isClosable = Math.random() > 0.5;
+        let timeRemaining = 15;
+        
+        box.innerHTML = `
+            <div class="ad-titlebar">
+                <span>${ad.company}</span>
+                <button class="ad-close-btn">X</button>
+            </div>
+            <div class="ad-content">
+                <div class="ad-img-placeholder">${ad.product}</div>
+                <div class="ad-headline">${ad.headline}</div>
+                <div class="ad-tagline">${ad.tagline}</div>
+                <div class="ad-fineprint">${ad.fineprint}</div>
+                <div class="ad-footer">
+                    <div class="ad-timer">CLOSING IN: ${timeRemaining}s</div>
+                    <button class="beveled skip-btn" style="font-size: 1rem; padding: 2px 8px;">SKIP AD ▶</button>
+                </div>
+            </div>
+        `;
+        
+        let closeBtn = box.querySelector('.ad-close-btn');
+        closeBtn.onclick = function() {
+            if(isClosable) {
+                removeAd(box);
+            }
+        };
+
+        let skipBtn = box.querySelector('.skip-btn');
+        skipBtn.onclick = function() {
+            window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank');
+        };
+        
+        let timerEl = box.querySelector('.ad-timer');
+        let interval = setInterval(() => {
+            timeRemaining--;
+            if (timeRemaining <= 0) {
+                clearInterval(interval);
+                removeAd(box);
             } else {
-                document.getElementById('ad-timer-text').innerText = `CLOSING IN: ${adTimeRemaining}s`;
+                timerEl.innerText = `CLOSING IN: ${timeRemaining}s`;
             }
         }, 1000);
+        
+        box.intervalId = interval;
+        document.getElementById('ad-overlay').appendChild(box);
+    }
+    
+    function removeAd(box) {
+        if(box.parentNode) {
+            clearInterval(box.intervalId);
+            box.parentNode.removeChild(box);
+            activeAds--;
+            if(activeAds <= 0) {
+                endAdSequence();
+            }
+        }
     }
 
     function endAdSequence() {
         document.getElementById('ad-overlay').classList.remove('active');
+        document.getElementById('ad-overlay').innerHTML = ''; // Ensure cleared
         let fm = document.getElementById('flash-message');
         fm.classList.add('active');
         setTimeout(() => {
             fm.classList.remove('active');
         }, 2000);
     }
+
+    // Automatically trigger every 60 seconds
+    setInterval(() => {
+        if (!document.getElementById('ad-overlay').classList.contains('active')) {
+            startAdSequence(3);
+        }
+    }, 60000);
 </script>
 
 <!-- Ad System Overlay -->
 <div id="ad-overlay">
-    <div class="ad-counter" id="ad-counter">AD 1 OF X</div>
-    <div class="ad-box">
-        <div class="ad-titlebar">
-            <span id="ad-company">COMPANY NAME</span>
-            <button class="ad-close-btn" onclick="return false">X</button>
-        </div>
-        <div class="ad-content">
-            <div class="ad-img-placeholder" id="ad-img">PRODUCT</div>
-            <div class="ad-headline" id="ad-headline">HEADLINE HERE</div>
-            <div class="ad-tagline" id="ad-tagline">Tagline goes here and explains why you need this.</div>
-            <div class="ad-fineprint" id="ad-fineprint">Fine print goes here.</div>
-            <div class="ad-footer">
-                <div class="ad-timer" id="ad-timer-text">CLOSING IN: 15s</div>
-                <button class="beveled" onclick="window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')" style="font-size: 1rem; padding: 2px 8px;">SKIP AD ▶</button>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div id="flash-message" class="flash-message">
