@@ -7,9 +7,10 @@ import assets from "../../../public/assets";
 export default function SignUpPage() {
   const [currentStep, setCurrentStep] = useState<'fake_form' | 'human_confirmed' | 'real_form'>('human_confirmed');
   const [clicks, setClicks] = useState(0);
-  const [glitching, setGlitching] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isLightMode, setIsLightMode] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+  const [glitching, setGlitching] = useState(false);
 
   // For real form
   const [username, setUsername] = useState("");
