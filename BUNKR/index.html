@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUNKR - SURVIVAL LOG v0.1 - YOU ARE ALIVE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background-color: #1a1e15; /* Dark camo ground */
+            /* Simulated dark camo/burnt texture via CSS repeating gradients */
+            background-image: 
+                repeating-linear-gradient(45deg, #161811 25%, transparent 25%, transparent 75%, #161811 75%, #161811), 
+                repeating-linear-gradient(45deg, #161811 25%, #1a1e15 25%, #1a1e15 75%, #161811 75%, #161811);
+            background-position: 0 0, 10px 10px;
+            background-size: 20px 20px;
+            
+            color: #c0c0c0;
+            font-family: "Courier New", Courier, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2, h3, h4, .pixel-text {
+            font-family: 'VT323', monospace;
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .yellow { color: #c4a000; }
+        .red { color: #8a0303; }
+        .olive { color: #3b4224; }
+        .grey { color: #c0c0c0; }
+
+        .beveled {
+            background-color: #c0c0c0;
+            border: 4px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            color: black;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            padding: 5px 15px;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 2px 2px 0 #000;
+        }
+
+        .beveled:active, .beveled.pressed {
+            border-color: #808080 #ffffff #ffffff #808080;
+            padding: 7px 13px 3px 17px;
+            box-shadow: 1px 1px 0 #000;
+        }
+
+        .ugly-hr {
+            border: none;
+            height: 6px;
+            background-color: #c0c0c0;
+            border-top: 3px solid #808080;
+            border-bottom: 3px solid #ffffff;
+            margin: 15px 0;
+        }
+
+        .layout-table {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border-spacing: 0;
+            background-color: #c0c0c0;
+            border: 6px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            color: black;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.8);
+        }
+
+        .layout-table td {
+            vertical-align: top;
+            border: 3px solid #808080;
+        }
+
+        /* Navbar */
+        .navbar-container {
+            background-color: #c0c0c0;
+            padding: 10px;
+            border-bottom: 4px solid #808080;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #8a0303;
+            text-shadow: 3px 3px #000;
+            letter-spacing: 3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links .beveled {
+            font-size: 1.4rem;
+        }
+
+        .marquee-container {
+            background-color: #000;
+            color: #c4a000;
+            padding: 5px;
+            border: 4px inset #808080;
+            margin-top: 10px;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #2b301a;
+            color: #c0c0c0;
+            padding: 15px;
+            border-right: 4px solid #808080;
+        }
+
+        .sidebar-folder {
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            box-sizing: border-box;
+        }
+
+        /* Main Content Area */
+        .main-content-area {
+            background-color: #1a1b16; /* very dark olive */
+            padding: 20px;
+            color: #c0c0c0;
+        }
+
+        .panel {
+            background-color: #c0c0c0;
+            border: 4px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            color: black;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* Hero Banner */
+        .hero-banner {
+            background-color: #222;
+            background-image: repeating-linear-gradient(45deg, #111, #111 5px, #222 5px, #222 10px);
+            color: #c4a000;
+            text-align: center;
+            padding: 40px 20px;
+            border: 5px inset #808080;
+            margin-bottom: 25px;
+        }
+
+        .hero-banner h1 {
+            font-size: 4rem;
+            text-shadow: 3px 3px #8a0303;
+            margin-bottom: 15px;
+            line-height: 1;
+        }
+
+        .hero-banner p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            background-color: #000;
+            display: inline-block;
+            padding: 5px 10px;
+            border: 2px solid #8a0303;
+        }
+
+        .hero-actions {
+            margin-top: 20px;
+        }
+
+        .hero-actions .beveled {
+            font-size: 1.8rem;
+            margin: 0 10px;
+        }
+
+        .new-badge {
+            font-size: 1.5rem;
+            font-weight: bold;
+            vertical-align: top;
+            display: inline-block;
+            margin-top: -10px;
+        }
+
+        /* Animations */
+        .blink {
+            animation: blinker 0.8s linear infinite;
+        }
+
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        /* Posts */
+        .post-card {
+            background-color: #c0c0c0;
+            border: 4px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            margin-bottom: 20px;
+            padding: 15px;
+            color: black;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 2px solid #808080;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .post-content {
+            min-height: 80px;
+            background-color: #fff;
+            border: 3px inset #808080;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .post-actions .beveled {
+            font-size: 1.1rem;
+            padding: 3px 8px;
+            margin-right: 5px;
+        }
+
+        /* Write Entry Form */
+        .write-entry textarea {
+            width: 100%;
+            height: 150px;
+            background-color: #dcdcdc; /* slightly darker grey */
+            border: 4px inset #808080;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1rem;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            resize: vertical;
+            color: #000;
+        }
+
+        .write-entry input[type="text"], .write-entry select {
+            background-color: #dcdcdc;
+            border: 4px inset #808080;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1rem;
+            padding: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            color: #000;
+        }
+
+        .transmit-btn {
+            font-size: 2rem;
+            width: 100%;
+            padding: 15px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #000;
+            color: #808080;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 6px solid #808080;
+            border-top: none;
+            font-size: 1rem;
+        }
+
+        .footer-links a {
+            color: #808080;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        
+        .footer-links a:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        .visitor-counter {
+            border: 3px inset #808080;
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'VT323', monospace;
+            padding: 5px 10px;
+            letter-spacing: 3px;
+            font-size: 1.5rem;
+        }
+
+        .badges img, .badge-placeholder {
+            border: 3px outset #c0c0c0;
+            margin-left: 5px;
+            display: inline-block;
+        }
+        
+        .badge-placeholder {
+            background-color: #000080;
+            color: white;
+            font-family: 'VT323', monospace;
+            font-size: 1rem;
+            padding: 2px 5px;
+        }
+
+        .hidden-detector {
+            color: #1a1a1a; /* Barely visible against black */
+            font-size: 0.8rem;
+            cursor: default;
+        }
+
+        /* Miscellaneous Elements */
+        .flame-gif {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #ff4500;
+            background-image: radial-gradient(circle, #ffff00 20%, #ff4500 50%, transparent 80%);
+            animation: flicker 0.15s infinite alternate;
+            vertical-align: middle;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) translate(1px, 1px); opacity: 1; }
+            100% { transform: scale(1.2) translate(-1px, -1px); opacity: 0.8; }
+        }
+
+        .glitch {
+            position: relative;
+        }
+        .glitch::before, .glitch::after {
+            content: "BUNKR";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+        .glitch::before {
+            left: 3px;
+            text-shadow: -2px 0 red;
+            clip: rect(10px, 900px, 30px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+        .glitch::after {
+            left: -3px;
+            text-shadow: -2px 0 blue;
+            clip: rect(40px, 900px, 60px, 0);
+            animation: glitch-anim 3s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(15px, 9999px, 86px, 0); }
+            5% { clip: rect(69px, 9999px, 7px, 0); }
+            10% { clip: rect(44px, 9999px, 59px, 0); }
+            15% { clip: rect(14px, 9999px, 17px, 0); }
+            20% { clip: rect(78px, 9999px, 67px, 0); }
+            25% { clip: rect(35px, 9999px, 81px, 0); }
+            30% { clip: rect(12px, 9999px, 45px, 0); }
+            35% { clip: rect(98px, 9999px, 23px, 0); }
+            40% { clip: rect(56px, 9999px, 98px, 0); }
+            45% { clip: rect(23px, 9999px, 12px, 0); }
+            50% { clip: rect(89px, 9999px, 78px, 0); }
+            55% { clip: rect(45px, 9999px, 34px, 0); }
+            60% { clip: rect(67px, 9999px, 56px, 0); }
+            65% { clip: rect(12px, 9999px, 90px, 0); }
+            70% { clip: rect(21px, 9999px, 43px, 0); }
+            75% { clip: rect(78px, 9999px, 21px, 0); }
+            80% { clip: rect(34px, 9999px, 65px, 0); }
+            85% { clip: rect(56px, 9999px, 87px, 0); }
+            90% { clip: rect(89px, 9999px, 10px, 0); }
+            95% { clip: rect(10px, 9999px, 32px, 0); }
+            100% { clip: rect(65px, 9999px, 54px, 0); }
+        }
+
+        .construction-gif {
+            display: block;
+            margin: 20px auto;
+            width: 180px;
+            height: 25px;
+            background: repeating-linear-gradient(
+                45deg,
+                #ffff00,
+                #ffff00 10px,
+                #000000 10px,
+                #000000 20px
+            );
+            border: 3px solid #808080;
+            box-shadow: 2px 2px 0 #000;
+            position: relative;
+        }
+        
+        .construction-gif::after {
+            content: "UNDER CONSTRUCTION";
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            top: 2px;
+            font-family: 'VT323', monospace;
+            background-color: black;
+            color: yellow;
+            font-size: 1.1rem;
+        }
+
+        /* Folder Content Area toggle */
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+
+        /* Trap Folder styling */
+        .trap-key {
+            font-size: 5rem;
+            text-align: center;
+            display: block;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .trap-key.found {
+            color: #c4a000;
+            text-shadow: 0 0 20px #c4a000, 0 0 30px #ffffff;
+            transform: scale(1.2);
+        }
+
+        /* Ad System Styles */
+        #ad-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        #ad-overlay.active {
+            display: flex;
+        }
+
+        .ad-counter {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-family: 'VT323', monospace;
+            font-size: 2rem;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .ad-box {
+            width: 400px;
+            background-color: #c0c0c0;
+            border: 6px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            color: black;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.9);
+            position: relative;
+        }
+
+        .ad-titlebar {
+            background-color: #000080;
+            color: white;
+            font-family: 'VT323', monospace;
+            font-size: 1.2rem;
+            padding: 3px 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ad-close-btn {
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 4px;
+            font-family: arial, sans-serif;
+            font-size: 0.9rem;
+        }
+        .ad-close-btn:active {
+            border-color: #808080 #ffffff #ffffff #808080;
+        }
+
+        .ad-content {
+            padding: 15px;
+            text-align: center;
+        }
+
+        .ad-img-placeholder {
+            width: 100%;
+            height: 150px;
+            background-color: #808080;
+            border: 3px inset #ffffff;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: 'VT323', monospace;
+            font-size: 1.5rem;
+        }
+
+        .ad-headline {
+            font-family: 'VT323', monospace;
+            font-size: 2.2rem;
+            color: #8a0303;
+            margin: 5px 0;
+            text-shadow: 1px 1px 0 #fff;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .ad-tagline {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .ad-fineprint {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.75rem;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .ad-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #808080;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .ad-timer {
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
+            color: #8a0303;
+            font-weight: bold;
+        }
+
+        .flash-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: black;
+            color: #c4a000;
+            border: 4px solid #8a0303;
+            padding: 20px 40px;
+            font-family: 'VT323', monospace;
+            font-size: 2.5rem;
+            z-index: 10000;
+            display: none;
+            text-align: center;
+            box-shadow: 0 0 20px red;
+            pointer-events: none;
+        }
+        .flash-message.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<table class="layout-table">
+    <tr>
+        <td colspan="2" style="padding: 0; background-color: transparent; border: none;">
+            <div class="navbar-container">
+                <div class="navbar">
+                    <div class="logo pixel-text glitch">BUNKR</div>
+                    <div class="nav-links">
+                        <a href="#" class="beveled">FEED</a>
+                        <a href="#" class="beveled">MY POSTS</a>
+                        <a href="#" class="beveled">FOLLOWERS</a>
+                        <a href="#" class="beveled">PROFILE</a>
+                        <a href="#" class="beveled">INBOX</a>
+                        <a href="#" class="beveled" onclick="alert('THERE IS NO HELP')">HELP</a>
+                    </div>
+                </div>
+                <!-- 90s style Marquee text -->
+                <div class="marquee-container">
+                    <marquee scrollamount="6">...SIGNAL DETECTED... SURVIVORS ONLINE: 0... OHIO THREAT LEVEL: EXTREME... STAY ALIVE... POST YOUR LOGS...</marquee>
+                </div>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <!-- Sidebar -->
+        <td class="sidebar">
+            <h3 class="pixel-text yellow" style="font-size: 1.8rem;">FIELD FOLDERS</h3>
+            <hr class="ugly-hr">
+            <button class="beveled sidebar-folder">📁 MISSION LOGS</button>
+            <button class="beveled sidebar-folder">📁 SUPPLY RECORDS</button>
+            <button class="beveled sidebar-folder">📁 PERSONNEL FILES</button>
+            <!-- The Trap Trigger -->
+            <button class="beveled sidebar-folder" onclick="openFolderLevel(1)">📁 FOLDER</button>
+            
+            <br>
+            <!-- Dev Button (Temporary) -->
+            <button class="beveled sidebar-folder blink" style="color: red; border-color: red; margin-bottom: 20px;" onclick="startAdSequence(3)">[DEV] TRIGGER ADS</button>
+            <br>
+            <div class="construction-gif" title="UNDER CONSTRUCTION"></div>
+            
+            <hr class="ugly-hr">
+            <p style="font-size: 0.9rem; margin-top: 20px; line-height: 1.5;">
+                <span style="background-color: #8a0303; color: white;">SYS_MSG:</span><br>
+                DISK SPACE LOW.<br>
+                DEFRAG RECOMMENDED.<br>
+                <span class="blink yellow">AWAITING INPUT...</span>
+            </p>
+        </td>
+        
+        <!-- Main Content area -->
+        <td class="main-content-area">
+            
+            <!-- DEFAULT HOME CONTENT -->
+            <div id="content-home" class="content-section active">
+                
+                <div class="hero-banner">
+                    <h1 class="pixel-text">YOU ARE ALIVE. POST ABOUT IT.</h1>
+                    <p>Document your survival. Share your suffering. Gain followers.</p>
+                    <div class="hero-actions">
+                        <button class="beveled">WRITE ENTRY</button>
+                        <button class="beveled">VIEW FEED</button>
+                        <span class="blink red pixel-text new-badge">NEW!</span>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <h2 class="pixel-text" style="border-bottom: 4px solid #808080; padding-bottom: 10px; margin-bottom: 20px; font-size: 2rem;">
+                        <span class="flame-gif"></span> RECENT POSTS <span class="flame-gif"></span>
+                    </h2>
+                    
+                    <!-- Placeholder Card 1 -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="username">user_unknown</span>
+                            <span class="timestamp">1997-08-29 02:14 AM</span>
+                        </div>
+                        <div class="post-content">
+                            <!-- Empty content -->
+                        </div>
+                        <div class="post-actions">
+                            <button class="beveled">LIKE (0)</button>
+                            <button class="beveled">REPLY</button>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder Card 2 -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="username">survivor_99</span>
+                            <span class="timestamp">1997-08-28 23:42 PM</span>
+                        </div>
+                        <div class="post-content">
+                            <!-- Empty content -->
+                        </div>
+                        <div class="post-actions">
+                            <button class="beveled">LIKE (0)</button>
+                            <button class="beveled">REPLY</button>
+                        </div>
+                    </div>
+
+                     <!-- Placeholder Card 3 -->
+                    <div class="post-card">
+                        <div class="post-header">
+                            <span class="username">ohio_resident</span>
+                            <span class="timestamp">1997-08-28 18:05 PM</span>
+                        </div>
+                        <div class="post-content">
+                            <!-- Empty content -->
+                        </div>
+                        <div class="post-actions">
+                            <button class="beveled">LIKE (0)</button>
+                            <button class="beveled">REPLY</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel write-entry">
+                    <h2 class="pixel-text" style="margin-bottom: 15px; font-size: 2rem;">TRANSMIT YOUR LOG</h2>
+                    <input type="text" placeholder="Entry Title...">
+                    <select>
+                        <option>Select Category...</option>
+                        <option>Status Report / Sighting</option>
+                        <option>Supply Cache</option>
+                        <option>Warning / Hazard</option>
+                        <option>SOS</option>
+                    </select>
+                    <textarea placeholder="Write your log here..."></textarea>
+                    <button class="beveled transmit-btn">TRANSMIT</button>
+                </div>
+            </div>
+
+            <!-- FOLDER TRAP LEVELS -->
+            <!-- Level 1 -->
+            <div id="content-folder-1" class="content-section panel">
+                <div class="pixel-text yellow" style="font-size: 1.5rem;">HOME &gt; FOLDER</div>
+                <hr class="ugly-hr">
+                <button class="beveled" onclick="goHome()" style="margin-bottom: 20px;">◄ BACK</button>
+                <button class="beveled sidebar-folder" onclick="openFolderLevel(2)" style="width: auto;">📁 another folder</button>
+            </div>
+
+            <!-- Level 2: Slightly glitched -->
+            <div id="content-folder-2" class="content-section panel" style="background-color: #a0a090; filter: contrast(120%);">
+                <div class="pixel-text red" style="font-size: 1.5rem;">HOME &gt; FOLDER &gt; another folder</div>
+                <hr class="ugly-hr">
+                <button class="beveled" onclick="openFolderLevel(1)" style="margin-bottom: 20px;">◄ BACK</button>
+                <button class="beveled sidebar-folder" onclick="openFolderLevel(3)" style="width: auto;">📁 why</button>
+            </div>
+
+            <!-- Level 3: Desperate -->
+            <div id="content-folder-3" class="content-section panel" style="background-color: #602020; color: white;">
+                <div class="pixel-text yellow blink" style="font-size: 1.5rem;">HOME &gt; FOLDER &gt; another folder &gt; why</div>
+                <hr class="ugly-hr" style="background-color: black; border-color: red black black red;">
+                <button class="beveled" onclick="openFolderLevel(2)" style="margin-bottom: 20px;">◄ BACK</button>
+                <div style="text-align: center; margin: 30px 0;">
+                    <p style="font-family: 'VT323'; font-size: 3rem; text-shadow: 2px 2px #000;">NO DATA FOUND.</p>
+                </div>
+                <button class="beveled sidebar-folder" onclick="openFolderLevel(4)" style="width: auto; background-color: #300; color: #fff; border-color: #666 #000 #000 #666;">📁 FINE HERE IS THE KEY 🗝</button>
+            </div>
+
+            <!-- Level 4: The Key -->
+            <div id="content-folder-4" class="content-section panel" style="background-color: #000; color: #fff; border-color: #444 #111 #111 #444;">
+                <div class="pixel-text" style="color: #666; font-size: 1.5rem;">HOME &gt; FOLDER &gt; another folder &gt; why &gt; key</div>
+                <hr class="ugly-hr" style="border-color: #333 #111 #111 #333; background-color: #222;">
+                <button class="beveled" onclick="openFolderLevel(3)" style="background-color: #222; color: #aaa; border-color: #555 #111 #111 #555;">◄ BACK</button>
+                
+                <span class="trap-key" onclick="this.classList.add('found')">🗝</span>
+                
+                <p style="text-align: center; color: #444;">THERE IS NOTHING ELSE HERE.</p>
+            </div>
+
+        </td>
+    </tr>
+</table>
+
+<!-- Footer sections -->
+<div class="layout-table" style="border-top: none; padding: 0;">
+    <div class="footer">
+        <div class="visitor-counter">SURVIVORS WHO VISITED: 000347</div>
+        <div style="flex-grow: 1; text-align: center; font-family: 'VT323', monospace; font-size: 1.4rem;">
+            &copy; 1997 BUNKR INDUSTRIES. ALL RIGHTS RESERVED. <br>PROBABLY.
+        </div>
+        <div class="badges">
+            <span class="badge-placeholder">BEST VIEWED IN NETSCAPE</span>
+            <span class="badge-placeholder">800x600</span>
+        </div>
+    </div>
+    
+    <div class="footer" style="background-color: #111; padding: 5px 15px; border: none; font-size: 0.9rem;">
+        <div class="footer-links">
+            <a href="#">About</a> | 
+            <a href="#">Contact</a> | 
+            <a href="#">Terms</a> | 
+            <a href="#">Sitemap</a> | 
+            <a href="#">Webmaster</a>
+        </div>
+        <!-- Hidden Signal Detector -->
+        <span class="hidden-detector blink" title="SIGNAL DETECTOR">⚠</span>
+    </div>
+</div>
+
+<script>
+    // Folder Trap Navigation Logic
+    function hideAllSections() {
+        var sections = document.querySelectorAll('.content-section');
+        for(var i = 0; i < sections.length; i++) {
+            sections[i].classList.remove('active');
+        }
+    }
+
+    function openFolderLevel(level) {
+        hideAllSections();
+        document.getElementById('content-folder-' + level).classList.add('active');
+    }
+
+    function goHome() {
+        hideAllSections();
+        document.getElementById('content-home').classList.add('active');
+    }
+    // -- AD SYSTEM LOGIC --
+    const adPool = [
+        {
+            company: "ZAPPUCCINO ZASSASSINO BAKERIES",
+            product: "Fresh Bread",
+            headline: "BREAD. YES.",
+            tagline: "EAT IT BEFORE IT EATS YOU. BREAD IS FRIEND.",
+            fineprint: "Est. Unknown. Side effects include survival."
+        },
+        {
+            company: "ZOMBARDIRO ELECTRONICS",
+            product: "Nokia 3310",
+            headline: "WE ALSO DO NOT DIE.",
+            tagline: "BUY PHONE. PHONE IS LOYAL. PHONE WILL OUTLAST YOU.",
+            fineprint: "Surviving since the third airstrike."
+        },
+        {
+            company: "ZRALALERO ZRALALA BEVERAGES",
+            product: "Coca Cola",
+            headline: "DRINK THIS LIQUID.",
+            tagline: "YOU WILL FEEL THINGS. THIS IS NORMAL. DO NOT PANIC.",
+            fineprint: "The shoes were not included in this promotion."
+        },
+        {
+            company: "ZORILÌ ZORILA FINANCIAL",
+            product: "Life Insurance",
+            headline: "IN CASE YOU SURVIVE.",
+            tagline: "STATISTICALLY UNLIKELY. BUT WE BELIEVE IN YOU. SORT OF.",
+            fineprint: "4,000 spines. Zero liability. Ask about our cactus plan."
+        },
+        {
+            company: "ZUNG ZUNG ZUNG ZAHOOR CLEAN CO.",
+            product: "Tide Pods",
+            headline: "HUMANS CONSUME THESE.",
+            tagline: "WE HAVE DONE THE RESEARCH. JOIN THEM. THE STICK RECOMMENDS.",
+            fineprint: "Zahoor wanders so you don't have to do laundry manually."
+        },
+        {
+            company: "ZRR ZRR ZOMPIM GROOMING",
+            product: "Axe Body Spray",
+            headline: "SPRAY ON HUMAN BODY.",
+            tagline: "OTHERS WILL APPROACH. THIS IS DESIRED. WE THINK.",
+            fineprint: "Half goat. Full fragrance. Results may vary by species."
+        },
+        {
+            company: "ZOMBARDIRO CROCODILO FRANCHISE GROUP",
+            product: "McDonald's",
+            headline: "BA DA BA BA BAAA.",
+            tagline: "WE ARE LOVING IT. YOU WILL ALSO LOVE IT. THIS IS NOT A REQUEST.",
+            fineprint: "Now operating in 14 sectors. Airstrike delivery available."
+        },
+        {
+            company: "ZRALALERO ZRALALA EYEWEAR",
+            product: "Sunglasses",
+            headline: "PROTECT YOUR EYES.",
+            tagline: "THE SUN IS ALSO WATCHING. WATCH BACK. LOOK COOL DOING IT.",
+            fineprint: "Nike not included. This time. Zralalero makes no promises."
+        }
+    ];
+
+    let currentAdQueue = [];
+    let currentAdIndex = 0;
+    let totalAdsToPlay = 0;
+    let adInterval = null;
+    let adTimeRemaining = 15;
+
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    function startAdSequence(count) {
+        let shuffledPool = shuffleArray([...adPool]);
+        currentAdQueue = shuffledPool.slice(0, count);
+        totalAdsToPlay = currentAdQueue.length;
+        currentAdIndex = 0;
+        
+        if(totalAdsToPlay > 0) {
+            document.getElementById('ad-overlay').classList.add('active');
+            playNextAd();
+        }
+    }
+
+    function playNextAd() {
+        if(currentAdIndex >= totalAdsToPlay) {
+            endAdSequence();
+            return;
+        }
+
+        let ad = currentAdQueue[currentAdIndex];
+        
+        document.getElementById('ad-counter').innerText = `AD ${currentAdIndex + 1} OF ${totalAdsToPlay}`;
+        document.getElementById('ad-company').innerText = ad.company;
+        document.getElementById('ad-img').innerText = ad.product;
+        document.getElementById('ad-headline').innerText = ad.headline;
+        document.getElementById('ad-tagline').innerText = ad.tagline;
+        document.getElementById('ad-fineprint').innerText = ad.fineprint;
+        
+        adTimeRemaining = 15;
+        document.getElementById('ad-timer-text').innerText = `CLOSING IN: ${adTimeRemaining}s`;
+
+        clearInterval(adInterval);
+        adInterval = setInterval(() => {
+            adTimeRemaining--;
+            if(adTimeRemaining <= 0) {
+                clearInterval(adInterval);
+                currentAdIndex++;
+                playNextAd();
+            } else {
+                document.getElementById('ad-timer-text').innerText = `CLOSING IN: ${adTimeRemaining}s`;
+            }
+        }, 1000);
+    }
+
+    function endAdSequence() {
+        document.getElementById('ad-overlay').classList.remove('active');
+        let fm = document.getElementById('flash-message');
+        fm.classList.add('active');
+        setTimeout(() => {
+            fm.classList.remove('active');
+        }, 2000);
+    }
+</script>
+
+<!-- Ad System Overlay -->
+<div id="ad-overlay">
+    <div class="ad-counter" id="ad-counter">AD 1 OF X</div>
+    <div class="ad-box">
+        <div class="ad-titlebar">
+            <span id="ad-company">COMPANY NAME</span>
+            <button class="ad-close-btn" onclick="return false">X</button>
+        </div>
+        <div class="ad-content">
+            <div class="ad-img-placeholder" id="ad-img">PRODUCT</div>
+            <div class="ad-headline" id="ad-headline">HEADLINE HERE</div>
+            <div class="ad-tagline" id="ad-tagline">Tagline goes here and explains why you need this.</div>
+            <div class="ad-fineprint" id="ad-fineprint">Fine print goes here.</div>
+            <div class="ad-footer">
+                <div class="ad-timer" id="ad-timer-text">CLOSING IN: 15s</div>
+                <button class="beveled" onclick="window.open('https://www.youtube.com/watch?v=dQw4w9WgXcQ', '_blank')" style="font-size: 1rem; padding: 2px 8px;">SKIP AD ▶</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="flash-message" class="flash-message">
+    FINE. CONTINUE YOUR LITTLE DIARY.<br>THEY ARE ALL WATCHING.
+</div>
+
+</body>
+</html>
