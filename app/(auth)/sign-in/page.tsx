@@ -2,14 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function SignInPage() {
-  const [panicLevel, setPanicLevel] = useState(0);
-
-  const handleTyping = () => {
-    // Every keystroke brings the zombies closer!
-    setPanicLevel(prev => Math.min(prev + 5, 100));
-  };
+  const router = useRouter();
+  const [failed, setFailed] = useState(false);
 
   return (
     <div className="min-h-screen bg-black text-red-600 font-mono p-4 flex flex-col items-center select-none">
@@ -29,43 +26,16 @@ export default function SignInPage() {
         ENTER CREDENTIALS QUICKLY. THEY HEARD YOU.
       </p>
 
-      {/* The "Eating" Animation Container */}
-      <div className="">
-        <div
-          className="absolute top-4 text-4xl transition-all duration-200 transform -scale-x-100"
-          style={{ right: `calc(-20% + ${panicLevel * 0.65}%)` }}
-        >
-          🧟‍♀️
-        </div>
-        <div
-          className="absolute top-14 text-5xl transition-all duration-200 transform -scale-x-100"
-          style={{ right: `calc(-15% + ${panicLevel * 0.55}%)` }}
-        >
-          🧟
-        </div>
-
-        {/* Text showing when totally eaten */}
-        {panicLevel >= 100 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 font-black text-4xl text-red-600 z-10 animate-ping">
-            <span>💀</span>
-            <span className="text-xl">YOU DIED.</span>
-          </div>
-        )}
-      </div>
-
       {/* Old Web Layout Form inside a Table */}
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          if (panicLevel >= 100) {
-            alert("ERROR: USER IS CURRENTLY BEING DIGESTED.");
-          } else {
-            alert("ACCESS DENIED! THE DOOR IS JAMMED! THEY BROKE THROUGH!");
-            setPanicLevel(100);
-          }
+          alert("ACCESS DENIED! RECORD NOT FOUND IN BUNKER DATABASES.");
+          setFailed(true);
         }}
+        className="w-full max-w-md"
       >
-        <table className="border-4 border-red-800 bg-black" cellPadding={12}>
+        <table className="border-4 border-red-800 bg-black w-full" cellPadding={12}>
           <tbody>
             <tr>
               <td colSpan={2} className="bg-red-900 font-bold text-black text-center text-xl sm:text-2xl border-b-4 border-red-800">
@@ -73,14 +43,13 @@ export default function SignInPage() {
               </td>
             </tr>
             <tr>
-              <td className="text-right border-b border-r border-red-800 font-bold sm:text-lg">
+              <td className="text-right border-b border-r border-red-800 font-bold sm:text-lg w-1/3">
                 USERNAME:
               </td>
               <td className="border-b border-red-800">
                 <input
                   type="text"
-                  onChange={handleTyping}
-                  disabled={panicLevel >= 100}
+                  disabled={failed}
                   className="bg-black text-red-500 border-2 border-red-600 p-2 w-full outline-none focus:bg-red-950 font-mono disabled:opacity-30 transition-colors"
                   placeholder="survivor_99"
                   required
@@ -94,8 +63,7 @@ export default function SignInPage() {
               <td className="border-b border-red-800">
                 <input
                   type="password"
-                  onChange={handleTyping}
-                  disabled={panicLevel >= 100}
+                  disabled={failed}
                   className="bg-black text-red-500 border-2 border-red-600 p-2 w-full outline-none focus:bg-red-950 font-mono disabled:opacity-30 transition-colors"
                   placeholder="*********"
                   required
@@ -104,13 +72,27 @@ export default function SignInPage() {
             </tr>
             <tr>
               <td colSpan={2} className="text-center p-6">
-                <button
-                  type="submit"
-                  disabled={panicLevel >= 100}
-                  className="bg-red-800 text-black font-black text-2xl px-6 py-3 border-4 border-outset border-red-500 hover:bg-red-600 hover:text-white cursor-pointer active:translate-y-1 disabled:opacity-20 disabled:cursor-not-allowed w-full transition-all"
-                >
-                  [ INITIATE LOGIN ]
-                </button>
+                {!failed ? (
+                  <button
+                    type="submit"
+                    className="bg-red-800 text-black font-black text-2xl px-6 py-3 border-4 border-outset border-red-500 hover:bg-red-600 hover:text-white cursor-pointer active:translate-y-1 w-full transition-all"
+                  >
+                    [ INITIATE LOGIN ]
+                  </button>
+                ) : (
+                  <div className="flex flex-col space-y-4">
+                    <p className="text-red-500 animate-pulse font-bold text-lg md:text-xl border border-red-800 bg-red-950/50 py-2">
+                       ACCOUNT NOT FOUND
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => router.push('/sign-up')}
+                      className="bg-yellow-600 text-black font-black text-2xl px-6 py-3 border-4 border-outset border-yellow-500 hover:bg-yellow-500 hover:text-white cursor-pointer active:translate-y-1 w-full transition-all"
+                    >
+                      [ INITIATE SIGN UP ]
+                    </button>
+                  </div>
+                )}
               </td>
             </tr>
           </tbody>
